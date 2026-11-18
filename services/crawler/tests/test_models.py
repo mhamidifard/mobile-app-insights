@@ -1,5 +1,3 @@
-from datetime import UTC, datetime
-
 from configs import FALLBACK_VERSION_LABEL
 from models import AppMetrics, Review
 
@@ -22,25 +20,35 @@ def test_translates_a_full_app_payload_into_the_metrics_model():
 
     metrics = AppMetrics.from_scraped_payload(app_payload, SCRAPED_AT)
 
-    assert metrics.min_installs == 1000000
-    assert metrics.real_installs == 950000
-    assert metrics.score == 4.57
-    assert metrics.ratings == 50000
-    assert metrics.reviews_count == 3000
-    assert metrics.version == "3.2.1"
     assert metrics.ad_supported is True
-    assert metrics.store_updated_at == datetime.fromtimestamp(STORE_UPDATED_EPOCH_SECONDS, tz=UTC).isoformat()
-    assert metrics.scraped_at == SCRAPED_AT
+    assert metrics.to_record() == {
+        "min_installs": 1000000,
+        "real_installs": 950000,
+        "score": 4.57,
+        "ratings": 50000,
+        "reviews_count": 3000,
+        "version": "3.2.1",
+        "ad_supported": True,
+        "store_updated_at": "2024-11-14T17:30:00+00:00",
+        "scraped_at": SCRAPED_AT,
+    }
 
 
 def test_minimal_app_payload_falls_back_to_the_default_version_and_score():
     metrics = AppMetrics.from_scraped_payload({}, SCRAPED_AT)
 
-    assert metrics.min_installs is None
-    assert metrics.score == 0.0
-    assert metrics.version == FALLBACK_VERSION_LABEL
     assert metrics.ad_supported is False
-    assert metrics.store_updated_at is None
+    assert metrics.to_record() == {
+        "min_installs": None,
+        "real_installs": None,
+        "score": 0.0,
+        "ratings": None,
+        "reviews_count": None,
+        "version": FALLBACK_VERSION_LABEL,
+        "ad_supported": False,
+        "store_updated_at": None,
+        "scraped_at": SCRAPED_AT,
+    }
 
 
 def test_translates_a_full_review_payload_into_the_review_model():
