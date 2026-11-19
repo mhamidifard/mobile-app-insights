@@ -66,11 +66,16 @@ def test_persists_one_metrics_row_for_the_application(clean_database, seed_appli
 def test_rerunning_the_same_review_updates_instead_of_duplicating(clean_database, seed_application):
     app_id = seed_application("Telegram", "org.telegram.messenger")
 
-    upsert_reviews(app_id, [review_model("r1", "first").to_record()])
-    second_run = [review_model("r1", "updated"), replace(review_model("r1", "second"), review_id="r2")]
-    upsert_reviews(app_id, [record.to_record() for record in second_run])
+    first = replace(review_model("r1", "first"), source_language="fa", source_country="ir")
+    upsert_reviews(app_id, [first.to_record()])
+    with get_db_cursor() as cursor:
+        cursor.execute(SELECT_REVIEW_CONTENTS, (app_id,))
+        assert cursor.fetchall() == [("r1", "first", "fa", "ir")]
+
+    updated = replace(first, content="updated", source_language="en", source_country="us")
+    upsert_reviews(app_id, [updated.to_record(), review_model("r2", "second").to_record()])
 
     with get_db_cursor() as cursor:
         cursor.execute(SELECT_REVIEW_CONTENTS, (app_id,))
         rows = cursor.fetchall()
-    assert rows == [("r1", "updated"), ("r2", "second")]
+    assert rows == [("r1", "updated", "en", "us"), ("r2", "second", None, None)]

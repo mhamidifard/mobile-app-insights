@@ -63,7 +63,9 @@ class _LocaleReviews:
 
     def add_page(self, rows: list[dict[str, Any]], token: Any, scraped_at: str) -> None:
         for payload in rows:
-            review = Review.from_scraped_payload(payload, scraped_at)
+            review = Review.from_scraped_payload(
+                payload, scraped_at, source_language=self.lang, source_country=self.country,
+            )
             if review is None:
                 continue
             if review.review_at is None:

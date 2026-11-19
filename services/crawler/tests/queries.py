@@ -18,4 +18,7 @@ COUNT_REVIEWS_FOR_APP = "SELECT count(*) FROM reviews WHERE app_id = %s;"
 SELECT_APP_IDS_WITH_METRICS = "SELECT app_id FROM app_metrics ORDER BY app_id;"
 SELECT_APP_REVIEW_IDS = "SELECT app_id, review_id FROM reviews ORDER BY app_id, review_id;"
 SELECT_APP_METRICS_ROW = "SELECT min_installs, score, version, ad_supported FROM app_metrics WHERE app_id = %s;"
-SELECT_REVIEW_CONTENTS = "SELECT review_id, content FROM reviews WHERE app_id = %s ORDER BY review_id;"
+SELECT_REVIEW_CONTENTS = """
+    SELECT review_id, content, source_language, source_country
+    FROM reviews WHERE app_id = %s ORDER BY review_id;
+"""

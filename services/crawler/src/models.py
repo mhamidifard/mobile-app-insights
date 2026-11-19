@@ -16,9 +16,14 @@ class Review:
     content: str
     review_at: str | None
     scraped_at: str
+    source_language: str | None = None
+    source_country: str | None = None
 
     @classmethod
-    def from_scraped_payload(cls, payload: dict[str, Any], scraped_at: str) -> "Review | None":
+    def from_scraped_payload(
+        cls, payload: dict[str, Any], scraped_at: str, *,
+        source_language: str | None = None, source_country: str | None = None,
+    ) -> "Review | None":
         """Translate a Play Store review with a usable ID into a stored observation."""
         review_id = payload.get("reviewId")
         if not isinstance(review_id, str) or not review_id.strip():
@@ -37,6 +42,8 @@ class Review:
             content=payload.get("content") or "",
             review_at=reviewed_at.isoformat() if reviewed_at is not None else None,
             scraped_at=scraped_at,
+            source_language=source_language,
+            source_country=source_country,
         )
 
     def to_record(self) -> dict[str, Any]:

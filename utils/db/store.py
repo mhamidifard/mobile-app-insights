@@ -56,6 +56,8 @@ def upsert_reviews(app_id: int, reviews: list[dict[str, Any]]) -> None:
             review.get("content", ""),
             review.get("review_at"),
             review.get("scraped_at"),
+            review.get("source_language"),
+            review.get("source_country"),
         )
         for review in reviews
     ]

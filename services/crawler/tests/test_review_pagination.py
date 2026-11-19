@@ -35,7 +35,7 @@ def test_merges_by_instant_across_pages_and_locales(monkeypatch, delays):
     pages = {
         ("fa", None): ([{"reviewId": "undated"}, dated("fa1", tie, "a"), {"content": "missing ID"}], "next"),
         ("fa", "next"): ([dated("fa2", tie, "b"), old, old], None),
-        ("en", None): ([new, dated("en1", tie, "c")], "next"),
+        ("en", None): ([new, dated("fa1", tie, "other copy"), dated("en1", tie, "c")], "next"),
         ("en", "next"): ([dated("en2", "2026-01-01T09:00:00+00:00", "d")], None),
     }
     fetch = Mock(side_effect=lambda app, **kw: pages[(kw["lang"], kw["continuation_token"])])
@@ -43,7 +43,10 @@ def test_merges_by_instant_across_pages_and_locales(monkeypatch, delays):
     records = PlayStoreScraper(fetch_reviews_page=fetch).get_latest_reviews(PACKAGE, count=6)
 
     assert [r["review_id"] for r in records] == ["shared", "fa1", "fa2", "en1", "en2", "undated"]
-    assert records[0]["content"] == "newer"
+    assert [(r["content"], r["source_language"], r["source_country"]) for r in records[:2]] == [
+        ("newer", "en", "us"),
+        ("a", "fa", "ir"),
+    ]
     assert records[0]["review_at"] == new["at"].isoformat()
     assert records[-1]["review_at"] is None
     assert all(datetime.fromisoformat(r["scraped_at"]).utcoffset() == UTC.utcoffset(None) for r in records)

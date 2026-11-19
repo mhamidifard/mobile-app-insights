@@ -31,6 +31,8 @@ CREATE TABLE IF NOT EXISTS reviews (
     score INT,
     thumbs_up_count INT DEFAULT 0,
     content TEXT,
+    source_language TEXT,
+    source_country TEXT,
     review_at TIMESTAMP WITH TIME ZONE,
     scraped_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
