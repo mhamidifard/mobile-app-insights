@@ -18,7 +18,7 @@ INSERT_APP_METRICS = """
 UPSERT_REVIEWS = """
     INSERT INTO reviews (
         review_id, app_id, user_name, score, thumbs_up_count,
-        content, review_at, scraped_at
+        content, review_at, scraped_at, source_language, source_country
     )
     VALUES %s
     ON CONFLICT (review_id) DO UPDATE SET
@@ -27,7 +27,9 @@ UPSERT_REVIEWS = """
         thumbs_up_count = EXCLUDED.thumbs_up_count,
         content = EXCLUDED.content,
         review_at = EXCLUDED.review_at,
-        scraped_at = EXCLUDED.scraped_at;
+        scraped_at = EXCLUDED.scraped_at,
+        source_language = EXCLUDED.source_language,
+        source_country = EXCLUDED.source_country;
 """
 
 SELECT_NETWORK_METRICS_BY_PCAP_HASH = "SELECT id FROM network_metrics WHERE pcap_hash = %s LIMIT 1;"

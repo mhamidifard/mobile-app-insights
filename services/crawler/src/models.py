@@ -16,7 +16,39 @@ class Review:
     content: str
     review_at: str | None
     scraped_at: str
+    source_language: str | None = None
+    source_country: str | None = None
 
+    @classmethod
+    def from_scraped_payload(
+        cls, payload: dict[str, Any], scraped_at: str, *,
+        source_language: str | None = None, source_country: str | None = None,
+    ) -> "Review | None":
+        """Translate a Play Store review with a usable ID into a stored observation."""
+        review_id = payload.get("reviewId")
+        if not isinstance(review_id, str) or not review_id.strip():
+            return None
+
+        reviewed_at = payload.get("at")
+        if reviewed_at is not None and reviewed_at.utcoffset() is None:
+            # google-play-scraper returns naive review times in the process's local timezone.
+            reviewed_at = reviewed_at.astimezone(UTC)
+
+        return cls(
+            review_id=review_id,
+            user_name=payload.get("userName"),
+            score=payload.get("score"),
+            thumbs_up_count=payload.get("thumbsUpCount") or 0,
+            content=payload.get("content") or "",
+            review_at=reviewed_at.isoformat() if reviewed_at is not None else None,
+            scraped_at=scraped_at,
+            source_language=source_language,
+            source_country=source_country,
+        )
+
+    def to_record(self) -> dict[str, Any]:
+        """Return the review fields consumed by upsert_reviews."""
+        return asdict(self)
 
 
 @dataclass(frozen=True)
