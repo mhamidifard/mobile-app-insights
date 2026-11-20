@@ -6,7 +6,7 @@ from pcap.models import DiscoveredPcap
 
 
 def discover_pcap_files(root: Path) -> list[DiscoveredPcap]:
-    """Walk root/<app>/<scenario>/*.pcap and fingerprint every capture found."""
+    """Find and fingerprint PCAP and PCAPNG files under root/<app>/<scenario>."""
     discovered: list[DiscoveredPcap] = []
     for app_directory in _list_subdirectories(root):
         for scenario_directory in _list_subdirectories(app_directory):
@@ -37,5 +37,8 @@ def _list_subdirectories(path: Path) -> list[Path]:
 
 
 def _list_pcap_files(path: Path) -> list[Path]:
-    """One scenario directory's .pcap files, sorted so discovery order is deterministic."""
-    return sorted(path.glob("*.pcap"))
+    """List the scenario's capture files in filename order."""
+    return sorted(
+        entry for entry in path.iterdir()
+        if entry.suffix.lower() in {".pcap", ".pcapng"} and entry.is_file()
+    )
