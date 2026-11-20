@@ -68,6 +68,7 @@ VALUES
   ('Bale', 'ir.nasim', 'Messaging', TRUE),
   ('Myirancell', 'com.myirancell', 'Operator', TRUE),
   ('Mymci', 'ir.mci.ecareapp', 'Operator', TRUE),
+  ('My Shatel Mobile', 'com.shmapp', 'Operator', TRUE),
   ('Namava', 'com.shatelland.namava.mobile', 'Video Streaming', TRUE),
   ('Lenz', 'com.likotv', 'Video Streaming', TRUE),
   ('Tamashakhonehtv', 'ir.tamashakhonehtv', 'Video Streaming', TRUE),
